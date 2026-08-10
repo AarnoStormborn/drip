@@ -1,6 +1,6 @@
-# Drip 🩸
+# Drip
 
-A terminal-based subscription tracker for India — UPI AutoPay (Google Pay) + credit cards (HDFC/ICICI).
+A terminal-based subscription tracker. It keeps a ledger of everything you're subscribed to — what you pay, how much, and when it's due — so you never lose track of your recurring spend.
 
 Built with Go, [Bubble Tea](https://github.com/charmbracelet/bubbletea), and SQLite (pure Go via `modernc.org/sqlite`, no CGO).
 
