@@ -22,6 +22,7 @@ type Subscription struct {
 	LastPaymentDate string // ISO YYYY-MM-DD
 	Status          string // active|paused|cancelled
 	FirstSeen       string // ISO YYYY-MM-DD (when the sub was first detected)
+	Descriptors     string // JSON array of normalized statement-descriptor keys
 	Notes           string
 	CreatedAt       string
 	UpdatedAt       string
