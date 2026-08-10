@@ -33,8 +33,9 @@ type App struct {
 	w, h  int
 	err   error
 
-	dash DashboardData
-	subs []model.Subscription // all subscriptions (any status)
+	dash    DashboardData
+	subs    []model.Subscription // all subscriptions (any status)
+	imports []model.ImportAudit  // recent import runs
 }
 
 // New builds the root model. The caller owns closing sqldb.
@@ -96,6 +97,13 @@ func (a *App) refresh() {
 	a.err = nil
 	a.subs = subs
 	a.dash = buildDashboard(active)
+
+	imports, err := db.ListImports(ctx, a.sqldb, 5)
+	if err != nil {
+		a.err = err
+		return
+	}
+	a.imports = imports
 }
 
 func (a *App) View() string {

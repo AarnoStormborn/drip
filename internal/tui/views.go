@@ -62,10 +62,22 @@ func (a *App) renderImport() string {
 	b.WriteString("\n")
 	b.WriteString(cardStyle.Render(lipgloss.JoinVertical(lipgloss.Left,
 		accentStyle.Render("Status:"),
-		"  • Import engine (CSV parsers, recurring detection) — milestone 2",
-		"  • Card PDF unlock + parse (HDFC/ICICI)          — milestone 4",
-		"  • GPay statement PDF + mandate list              — milestone 5",
+		"  • Import engine — HDFC PDF ✓ (CSV/XLSX parsers pending samples)",
+		"  • Recurring detection → auto-created subscriptions  — milestone 3",
+		"  • Card PDF unlock + parse (HDFC/ICICI)              — milestone 4",
+		"  • GPay statement PDF + mandate list                  — milestone 5",
 	)))
+
+	if len(a.imports) > 0 {
+		b.WriteString("\n\n")
+		b.WriteString(headerStyle.Render("RECENT IMPORTS"))
+		b.WriteString("\n")
+		for _, im := range a.imports {
+			when := strings.TrimSuffix(im.ImportedAt, ":00")
+			fmt.Fprintf(&b, "  %-24s %-12s %-8s %s\n",
+				truncate(im.File, 24), im.Source, fmt.Sprint(im.Matched)+" rec", when)
+		}
+	}
 	return b.String()
 }
 

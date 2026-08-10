@@ -43,7 +43,7 @@ func TestRenderAllTabs(t *testing.T) {
 	want := map[Tab][]string{
 		TabDashboard:     {"Active subscriptions", "Monthly spend", "Netflix", "₹649.00"},
 		TabSubscriptions: {"SERVICE", "Netflix", "YouTube Premium", "Notion Plus", "Monthly", "paused"},
-		TabImport:        {"MONTHLY ROUTINE", "drip import", "milestone 2"},
+		TabImport:        {"MONTHLY ROUTINE", "drip import", "milestone 3"},
 		TabReconcile:     {"Reconcile", "milestone 7"},
 	}
 	for tab, needles := range want {

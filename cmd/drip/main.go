@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +12,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"drip/internal/db"
+	"drip/internal/import"
+	"drip/internal/model"
 	"drip/internal/tui"
 )
 
@@ -35,8 +38,12 @@ func main() {
 	if args := flag.Args(); len(args) > 0 {
 		switch args[0] {
 		case "import":
-			fmt.Fprintln(os.Stderr, "drip: `import` arrives in milestone 2 (import engine + parsers). Use the TUI to browse for now.")
-			os.Exit(2)
+			if len(args) < 2 {
+				fmt.Fprintln(os.Stderr, "drip: usage: drip import <dir> — parse statement files in <dir>")
+				os.Exit(2)
+			}
+			runImport(args[1], *dbPath)
+			return
 		default:
 			fmt.Fprintf(os.Stderr, "drip: unknown command %q — see `drip -h`\n", args[0])
 			os.Exit(2)
@@ -55,6 +62,60 @@ func main() {
 		fmt.Fprintln(os.Stderr, "drip:", err)
 		os.Exit(1)
 	}
+}
+
+// runImport parses every supported statement file in dir into the DB and
+// prints a per-file summary.
+func runImport(dir, dbPath string) {
+	sqldb, err := db.Open(dbPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "drip:", err)
+		os.Exit(1)
+	}
+	defer sqldb.Close()
+
+	ctx := context.Background()
+	results, err := importer.ImportDir(ctx, sqldb, dir)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "drip:", err)
+		os.Exit(1)
+	}
+	if len(results) == 0 {
+		fmt.Printf("no statement files (.pdf/.csv/.xlsx) found in %s\n", dir)
+		return
+	}
+
+	var totalImported, totalDup int64
+	for _, r := range results {
+		if r.Err != nil {
+			fmt.Printf("✗ %-24s %s\n", r.File, r.Err)
+			continue
+		}
+		dr, cr := countSides(r.Records)
+		fmt.Printf("✓ %-24s %s: %d records (%d debit / %d credit)", r.File, r.Source, len(r.Records), dr, cr)
+		if r.Imported > 0 {
+			fmt.Printf(" → %d inserted", r.Imported)
+		}
+		if r.Duplicates > 0 {
+			fmt.Printf(", %d duplicates skipped", r.Duplicates)
+		}
+		fmt.Println()
+		totalImported += r.Imported
+		totalDup += r.Duplicates
+	}
+	fmt.Printf("\n%d new records, %d duplicates skipped\n", totalImported, totalDup)
+}
+
+// countSides tallies debit (negative) vs credit (positive) records.
+func countSides(recs []model.StatementRecord) (dr, cr int) {
+	for _, r := range recs {
+		if r.Amount < 0 {
+			dr++
+		} else {
+			cr++
+		}
+	}
+	return dr, cr
 }
 
 // defaultDBPath keeps the database outside the repo (it holds personal
