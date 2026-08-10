@@ -12,6 +12,7 @@ make run          # start the TUI
 make test         # run tests
 
 drip import <dir> # parse statement files in <dir> into the database
+drip detect       # re-scan the ledger for recurring subscriptions
 ```
 
 ### Keys

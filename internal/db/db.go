@@ -40,10 +40,3 @@ func Open(path string) (*sql.DB, error) {
 	}
 	return sqldb, nil
 }
-
-func migrate(sqldb *sql.DB) error {
-	if _, err := sqldb.Exec(schema); err != nil {
-		return err
-	}
-	return nil
-}

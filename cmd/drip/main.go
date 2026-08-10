@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"os"
@@ -12,6 +13,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"drip/internal/db"
+	"drip/internal/detect"
 	"drip/internal/import"
 	"drip/internal/model"
 	"drip/internal/tui"
@@ -44,6 +46,9 @@ func main() {
 			}
 			runImport(args[1], *dbPath)
 			return
+		case "detect":
+			runDetect(*dbPath)
+			return
 		default:
 			fmt.Fprintf(os.Stderr, "drip: unknown command %q — see `drip -h`\n", args[0])
 			os.Exit(2)
@@ -64,8 +69,8 @@ func main() {
 	}
 }
 
-// runImport parses every supported statement file in dir into the DB and
-// prints a per-file summary.
+// runImport parses every supported statement file in dir into the DB, runs
+// recurring detection on the fresh records, and prints a per-file summary.
 func runImport(dir, dbPath string) {
 	sqldb, err := db.Open(dbPath)
 	if err != nil {
@@ -104,6 +109,35 @@ func runImport(dir, dbPath string) {
 		totalDup += r.Duplicates
 	}
 	fmt.Printf("\n%d new records, %d duplicates skipped\n", totalImported, totalDup)
+
+	if totalImported > 0 {
+		printDetection(runDetectOn(sqldb))
+	}
+}
+
+// runDetect re-scans the whole ledger and reports.
+func runDetect(dbPath string) {
+	sqldb, err := db.Open(dbPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "drip:", err)
+		os.Exit(1)
+	}
+	defer sqldb.Close()
+	printDetection(runDetectOn(sqldb))
+}
+
+func runDetectOn(sqldb *sql.DB) detect.Result {
+	res, err := detect.Run(context.Background(), sqldb)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "drip:", err)
+		os.Exit(1)
+	}
+	return res
+}
+
+func printDetection(res detect.Result) {
+	fmt.Printf("detect: %d recurring subscriptions (%d created, %d refreshed), %d single-charge candidates\n",
+		res.Total, res.Created, res.Updated, res.Candidates)
 }
 
 // countSides tallies debit (negative) vs credit (positive) records.

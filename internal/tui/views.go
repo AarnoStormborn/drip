@@ -63,7 +63,7 @@ func (a *App) renderImport() string {
 	b.WriteString(cardStyle.Render(lipgloss.JoinVertical(lipgloss.Left,
 		accentStyle.Render("Status:"),
 		"  • Import engine — HDFC PDF ✓ (CSV/XLSX parsers pending samples)",
-		"  • Recurring detection → auto-created subscriptions  — milestone 3",
+		"  • Recurring detection ✓ — auto-creates subscriptions from debits",
 		"  • Card PDF unlock + parse (HDFC/ICICI)              — milestone 4",
 		"  • GPay statement PDF + mandate list                  — milestone 5",
 	)))
