@@ -70,13 +70,13 @@ Plus `drip mandate add`: paste/copy GPay **UPI Autopay list** (authoritative, cr
 
 ## Milestones
 
-1. **Scaffold** — module, Bubble Tea shell w/ nav, SQLite schema, migrations
-2. **Import engine** — HDFC/ICICI savings CSV → normalized records
-3. **Detection** — recurring heuristics → subscription upserts
-4. **Card PDFs** — unlock + extract HDFC/ICICI card statements
-5. **GPay** — statement PDF + mandate list ingestion
-6. **TUI polish** — dashboard/detail/forms, due-date reminders
-7. **Reconcile view** + backfill from existing statements
+1. ✅ **Scaffold** — module, Bubble Tea shell w/ nav, SQLite schema, migrations (committed)
+2. ⏳ **Import engine** — HDFC/ICICI savings CSV → normalized records
+3. ⏳ **Detection** — recurring heuristics → subscription upserts
+4. ⏳ **Card PDFs** — unlock + extract HDFC/ICICI card statements
+5. ⏳ **GPay** — statement PDF + mandate list ingestion
+6. ⏳ **TUI polish** — dashboard/detail/forms, due-date reminders
+7. ⏳ **Reconcile view** + backfill from existing statements
 
 ## Open items (verify during build)
 
