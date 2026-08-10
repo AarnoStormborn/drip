@@ -1,0 +1,32 @@
+# ── Drip: everything sensitive stays local ────────────────────────────────
+# SQLite databases — NEVER commit
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+# Data dir (runtime DB lives here)
+/data/
+
+# Inbox — user's bank/credit-card/GPay statement files. NEVER commit.
+/inbox/
+
+# ── Build artifacts ────────────────────────────────────────────────────────
+/drip
+/bin/
+dist/
+*.exe
+
+# ── Go ─────────────────────────────────────────────────────────────────────
+# (vendor/ intentionally NOT ignored — if vendoring, commit it)
+
+# ── OS / editor ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
