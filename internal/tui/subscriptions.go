@@ -25,10 +25,11 @@ const (
 )
 
 var (
-	selStyle  = lipgloss.NewStyle().Background(lipgloss.Color("236"))
-	dueToday  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
-	infoLabel = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
-	hintStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Italic(true)
+	selStyle     = lipgloss.NewStyle().Background(lipgloss.Color("236"))
+	dueToday     = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
+	infoLabel    = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
+	hintStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Italic(true)
+	overdueStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
 )
 
 // handleSubsKey routes keys while on the Subscriptions tab (list/detail/confirm).
@@ -165,6 +166,9 @@ func (a *App) renderSubsList() string {
 		if s.NextPaymentDate == today {
 			marker = "⚠"
 			next = dueToday.Render(next)
+		} else if s.NextPaymentDate != "" && s.NextPaymentDate < today {
+			marker = "⚠"
+			next = overdueStyle.Render(next)
 		}
 		row := fmt.Sprintf("%s%-*s %-*s %*s %-*s %s",
 			marker,

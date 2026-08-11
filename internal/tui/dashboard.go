@@ -14,8 +14,9 @@ import (
 // DashboardData is the computed state shown on the Dashboard tab.
 type DashboardData struct {
 	ActiveCount  int
-	MonthlySpend int64 // paise
-	DueSoon      []model.Subscription
+	MonthlySpend int64                // paise
+	Overdue      []model.Subscription // next payment date in the past
+	DueSoon      []model.Subscription // next payment within the next 7 days
 }
 
 func buildDashboard(active []model.Subscription) DashboardData {
@@ -31,7 +32,10 @@ func buildDashboard(active []model.Subscription) DashboardData {
 		if err != nil {
 			continue
 		}
-		if !next.Before(today) && !next.After(week) {
+		switch {
+		case next.Before(today):
+			d.Overdue = append(d.Overdue, s)
+		case !next.After(week):
 			d.DueSoon = append(d.DueSoon, s)
 		}
 	}
@@ -45,6 +49,7 @@ func (a *App) renderDashboard() string {
 	stats := cardStyle.Render(lipgloss.JoinVertical(lipgloss.Left,
 		"Active subscriptions   "+accentStyle.Render(strconv.Itoa(d.ActiveCount)),
 		"Monthly spend          "+accentStyle.Render(FormatINR(d.MonthlySpend)),
+		"Overdue                "+overdueCount(d.Overdue),
 		"Due within 7 days      "+accentStyle.Render(strconv.Itoa(len(d.DueSoon))),
 	))
 	b.WriteString(stats)
@@ -53,9 +58,19 @@ func (a *App) renderDashboard() string {
 	if d.ActiveCount == 0 {
 		b.WriteString(mutedStyle.Render(
 			"No active subscriptions yet.\n" +
-				"Drop your statement files in the inbox and run `drip import <folder>` (arriving in milestone 2),\n" +
+				"Drop your statement files in the inbox and run `drip import <folder>`,\n" +
 				"or press 3 (Import) for the monthly routine."))
 		return b.String()
+	}
+
+	if len(d.Overdue) > 0 {
+		b.WriteString(overdueStyle.Render("OVERDUE — payment date has passed"))
+		b.WriteString("\n")
+		for _, s := range d.Overdue {
+			fmt.Fprintf(&b, "  ⚠ %-28s %s   due %s\n",
+				truncate(s.Service, 28), accentStyle.Render(FormatINR(s.Amount)), dueToday.Render(FormatDate(s.NextPaymentDate)))
+		}
+		b.WriteString("\n")
 	}
 
 	b.WriteString(headerStyle.Render("NEXT 7 DAYS"))
@@ -69,4 +84,12 @@ func (a *App) renderDashboard() string {
 		}
 	}
 	return b.String()
+}
+
+func overdueCount(overdue []model.Subscription) string {
+	n := len(overdue)
+	if n == 0 {
+		return greenStyle.Render("0")
+	}
+	return overdueStyle.Render(strconv.Itoa(n))
 }
