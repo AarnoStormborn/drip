@@ -75,7 +75,7 @@ Plus `drip mandate add`: paste/copy GPay **UPI Autopay list** (authoritative, cr
 3. ✅ **Detection** — recurring heuristics → subscription upserts (UPI-AUTOPAY marker = guaranteed sub; dominant-amount per service; cadence inference; price history; reactivation)
 4. ⏳ **Card PDFs** — unlock + extract HDFC/ICICI card statements
 5. ⏳ **GPay** — statement PDF + mandate list ingestion
-6. ⏳ **TUI polish** — dashboard/detail/forms, due-date reminders
+6. ✅ **TUI polish** — interactive subscriptions tab: ↑/↓ select, detail view (price history, descriptors), edit form, delete confirm; dashboard due-in-7-days list; due-today ⚠ markers
 7. ⏳ **Reconcile view** + backfill from existing statements
 
 ## Open items (verify during build)

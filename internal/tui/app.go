@@ -36,6 +36,12 @@ type App struct {
 	dash    DashboardData
 	subs    []model.Subscription // all subscriptions (any status)
 	imports []model.ImportAudit  // recent import runs
+
+	// Subscriptions tab interaction state
+	subsMode   subsMode
+	subsSel    int
+	selHistory []model.PriceHistory
+	form       *editForm
 }
 
 // New builds the root model. The caller owns closing sqldb.
@@ -52,31 +58,84 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m := msg.(type) {
 	case tea.WindowSizeMsg:
 		a.w, a.h = m.Width, m.Height
+		if a.form != nil {
+			a.form.Update(m)
+		}
 	case tea.KeyMsg:
+		// Edit form consumes all keys (except ctrl+c quits) so typing works.
+		if a.tab == TabSubscriptions && a.subsMode == subsForm && a.form != nil {
+			switch m.String() {
+			case "ctrl+c":
+				return a, tea.Quit
+			case "esc":
+				a.form.Cancelled = true
+			case "ctrl+s":
+				a.saveForm()
+			default:
+				a.form.Update(m)
+			}
+			if a.form != nil && a.form.Cancelled {
+				a.form = nil
+				a.subsMode = subsDetail
+			}
+			return a, nil
+		}
+
 		switch m.String() {
 		case "q", "ctrl+c":
 			return a, tea.Quit
 		case "1":
 			a.tab = TabDashboard
+			a.subsMode = subsList
 			a.refresh()
 		case "2":
 			a.tab = TabSubscriptions
 			a.refresh()
 		case "3":
 			a.tab = TabImport
+			a.subsMode = subsList
 		case "4":
 			a.tab = TabReconcile
+			a.subsMode = subsList
 		case "tab":
 			a.tab = Tab((int(a.tab) + 1) % len(tabNames))
+			a.subsMode = subsList
 			a.refresh()
 		case "shift+tab":
 			a.tab = Tab((int(a.tab) + len(tabNames) - 1) % len(tabNames))
+			a.subsMode = subsList
 			a.refresh()
 		case "r":
 			a.refresh()
+		default:
+			if a.tab == TabSubscriptions {
+				a.handleSubsKey(m)
+			}
 		}
 	}
 	return a, nil
+}
+
+// saveForm persists the edited subscription (called from the form on ctrl+s).
+func (a *App) saveForm() {
+	s, err := db.GetSubscription(context.Background(), a.sqldb, a.form.targetID)
+	if err != nil {
+		a.form.Err = fmt.Sprintf("load subscription: %v", err)
+		return
+	}
+	updated, err := a.form.Build(s)
+	if err != nil {
+		a.form.Err = err.Error()
+		return
+	}
+	if err := db.UpdateSubscription(context.Background(), a.sqldb, &updated); err != nil {
+		a.form.Err = err.Error()
+		return
+	}
+	a.form = nil
+	a.subsMode = subsDetail
+	a.refresh()
+	a.openDetail(a.subsSel)
 }
 
 // refresh reloads dashboard data and the subscription list from SQLite.

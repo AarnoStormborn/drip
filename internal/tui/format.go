@@ -82,6 +82,38 @@ func FormatDate(iso string) string {
 	return t.Format("02 Jan 2006")
 }
 
+// formatRupees renders paise as a plain decimal string, e.g. 64900 → "649.00".
+func formatRupees(paise int64) string {
+	neg := paise < 0
+	if neg {
+		paise = -paise
+	}
+	s := fmt.Sprintf("%d.%02d", paise/100, paise%100)
+	if neg {
+		s = "-" + s
+	}
+	return s
+}
+
+// parseRupees converts a user-entered rupee amount ("649", "649.50",
+// "1,299.50") to paise. Rejects empty/negative/zero.
+func parseRupees(s string) (int64, error) {
+	s = strings.TrimSpace(s)
+	s = strings.TrimPrefix(s, "₹")
+	s = strings.ReplaceAll(s, ",", "")
+	if s == "" {
+		return 0, fmt.Errorf("amount is empty")
+	}
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0, fmt.Errorf("amount %q is not a number", s)
+	}
+	if f <= 0 {
+		return 0, fmt.Errorf("amount must be positive")
+	}
+	return int64(f*100 + 0.5), nil
+}
+
 // StatusLabel styles a status string (kept plain; colors applied separately).
 func StatusLabel(status string) string {
 	switch status {

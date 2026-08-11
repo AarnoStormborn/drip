@@ -24,6 +24,15 @@ drip detect       # re-scan the ledger for recurring subscriptions
 | `r` | Refresh from database |
 | `q` / `ctrl+c` | Quit |
 
+In the Subscriptions tab:
+
+| Key | Action |
+|---|---|
+| `↑`/`↓` | Select subscription |
+| `enter` | Open detail (price history, descriptors) |
+| `e` | Edit — fields: ↑/↓ move, ←/→ cycle, `ctrl+s` save, `esc` cancel |
+| `d` | Delete (confirm with `y`) |
+
 ### Database
 
 The database defaults to `~/.drip/drip.db` (override with `-db <path>` or `DRIP_DB`). It holds personal financial data and is never committed; `.gitignore` covers `*.db`, `/data/`, and `/inbox/`.
