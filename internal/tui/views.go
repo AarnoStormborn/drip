@@ -15,33 +15,6 @@ const (
 	wStatus  = 12
 )
 
-func (a *App) renderSubscriptions() string {
-	if len(a.subs) == 0 {
-		return cardStyle.Render(
-			"Nothing here yet.\n\n" +
-				"Once the import pipeline lands (milestone 2), `drip import <folder>` will parse your\n" +
-				"statements and auto-create subscriptions. You'll also be able to add one manually.")
-	}
-
-	rows := []string{fmt.Sprintf("%-*s %-*s %*s %-*s %s",
-		wService, "SERVICE",
-		wCycle, "CYCLE",
-		wAmount, "AMOUNT",
-		wNext, "NEXT DUE",
-		headerStyle.Render(fmt.Sprintf("%-*s", wStatus, "STATUS")),
-	)}
-	for _, s := range a.subs {
-		rows = append(rows, fmt.Sprintf("%-*s %-*s %*s %-*s %s",
-			wService, truncate(s.Service, wService),
-			wCycle, CycleLabel(s.Cycle),
-			wAmount, FormatINR(s.Amount),
-			wNext, FormatDate(s.NextPaymentDate),
-			statusCellPadded(s.Status),
-		))
-	}
-	return strings.Join(rows, "\n")
-}
-
 func (a *App) renderImport() string {
 	var b strings.Builder
 	b.WriteString(headerStyle.Render("THE MONTHLY ROUTINE (~10–15 MIN)"))
