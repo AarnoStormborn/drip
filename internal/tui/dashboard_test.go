@@ -30,8 +30,8 @@ func TestBuildDashboardOverdueAndDueSoon(t *testing.T) {
 	if len(d.DueSoon) != 2 {
 		t.Errorf("DueSoon = %+v, want 2 (DueToday + DueSoonSub)", d.DueSoon)
 	}
-	// monthly spend: 100 + 200 + 50 + 2500 = 2850 ₹ → 285000 paise
-	if d.MonthlySpend != 285000 {
-		t.Errorf("MonthlySpend = %d, want 285000", d.MonthlySpend)
+	// monthly spend in paise: 10000 + 20000 + 5000 + (30000/12) = 37500
+	if d.MonthlySpend != 37500 {
+		t.Errorf("MonthlySpend = %d, want 37500", d.MonthlySpend)
 	}
 }

@@ -28,7 +28,7 @@ func buildDashboard(active []model.Subscription) DashboardData {
 
 	for _, s := range active {
 		d.MonthlySpend += MonthlyAmount(s)
-		next, err := time.Parse("2006-01-02", s.NextPaymentDate)
+		next, err := time.ParseInLocation("2006-01-02", s.NextPaymentDate, time.Local)
 		if err != nil {
 			continue
 		}
