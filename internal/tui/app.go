@@ -117,8 +117,34 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 // saveForm persists the edited subscription (called from the form on ctrl+s).
+// A zero targetID means the form is in add mode → create a new subscription.
 func (a *App) saveForm() {
-	s, err := db.GetSubscription(context.Background(), a.sqldb, a.form.targetID)
+	ctx := context.Background()
+	if a.form.targetID == 0 {
+		base := model.Subscription{}
+		updated, err := a.form.Build(base)
+		if err != nil {
+			a.form.Err = err.Error()
+			return
+		}
+		id, err := db.CreateSubscription(ctx, a.sqldb, &updated)
+		if err != nil {
+			a.form.Err = err.Error()
+			return
+		}
+		a.form = nil
+		a.subsMode = subsList
+		a.refresh()
+		for i, s := range a.subs {
+			if s.ID == id {
+				a.subsSel = i
+				break
+			}
+		}
+		return
+	}
+
+	s, err := db.GetSubscription(ctx, a.sqldb, a.form.targetID)
 	if err != nil {
 		a.form.Err = fmt.Sprintf("load subscription: %v", err)
 		return
@@ -128,7 +154,7 @@ func (a *App) saveForm() {
 		a.form.Err = err.Error()
 		return
 	}
-	if err := db.UpdateSubscription(context.Background(), a.sqldb, &updated); err != nil {
+	if err := db.UpdateSubscription(ctx, a.sqldb, &updated); err != nil {
 		a.form.Err = err.Error()
 		return
 	}

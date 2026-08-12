@@ -53,6 +53,8 @@ func (a *App) handleSubsKey(m tea.KeyMsg) bool {
 			if len(a.subs) > 0 {
 				a.openForm(a.subs[a.subsSel])
 			}
+		case "a":
+			a.openAddForm()
 		case "d":
 			if len(a.subs) > 0 {
 				a.subsMode = subsConfirm
@@ -98,7 +100,12 @@ func (a *App) openDetail(idx int) {
 }
 
 func (a *App) openForm(s model.Subscription) {
-	a.form = newEditForm(s)
+	a.form = newEditForm(s, false)
+	a.subsMode = subsForm
+}
+
+func (a *App) openAddForm() {
+	a.form = newEditForm(model.Subscription{}, true)
 	a.subsMode = subsForm
 }
 
@@ -188,7 +195,7 @@ func (a *App) renderSubsList() string {
 	if a.err != nil {
 		body += "\n\n" + errorStyle.Render("⚠ "+a.err.Error())
 	}
-	return body + "\n\n" + hintStyle.Render("↑/↓ select · enter detail · e edit · d delete")
+	return body + "\n\n" + hintStyle.Render("↑/↓ select · enter detail · e edit · a add · d delete")
 }
 
 func (a *App) renderConfirm() string {

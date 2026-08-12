@@ -31,6 +31,7 @@ In the Subscriptions tab:
 | `↑`/`↓` | Select subscription |
 | `enter` | Open detail (price history, descriptors) |
 | `e` | Edit — fields: ↑/↓ move, ←/→ cycle, `ctrl+s` save, `esc` cancel |
+| `a` | Add a subscription manually (same form) |
 | `d` | Delete (confirm with `y`) |
 
 ### Database
