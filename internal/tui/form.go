@@ -37,20 +37,39 @@ type editForm struct {
 	Cancelled bool
 }
 
-func newEditForm(s model.Subscription) *editForm {
+// newEditForm builds the edit form. When adding is true the subscription is
+// zero-valued (targetID 0) and fields get sensible defaults.
+func newEditForm(s model.Subscription, adding bool) *editForm {
 	f := &editForm{targetID: s.ID}
 	cycleChoices := []string{"weekly", "monthly", "quarterly", "half-yearly", "yearly", "once"}
 	statusChoices := []string{"active", "paused", "cancelled"}
 	railChoices := []string{"upi_autopay", "card_emandate", "app_store", "merchant_direct", "bank_si"}
 
+	cycle := s.Cycle
+	if !containsStr(cycleChoices, cycle) {
+		cycle = "monthly"
+	}
+	status := s.Status
+	if !containsStr(statusChoices, status) {
+		status = "active"
+	}
+	rail := s.Rail
+	if !containsStr(railChoices, rail) {
+		rail = "merchant_direct"
+	}
+	amount := formatRupees(s.Amount)
+	if adding {
+		amount = ""
+	}
+
 	f.fields = []*formField{
 		{label: "Service", kind: fText, value: s.Service},
-		{label: "Amount (₹)", kind: fText, value: formatRupees(s.Amount)},
+		{label: "Amount (₹)", kind: fText, value: amount},
 		{label: "Category", kind: fText, value: s.Category},
 		{label: "Next due (YYYY-MM-DD)", kind: fText, value: s.NextPaymentDate},
-		{label: "Cycle", kind: fChoice, value: s.Cycle, choices: cycleChoices},
-		{label: "Status", kind: fChoice, value: s.Status, choices: statusChoices},
-		{label: "Rail", kind: fChoice, value: s.Rail, choices: railChoices},
+		{label: "Cycle", kind: fChoice, value: cycle, choices: cycleChoices},
+		{label: "Status", kind: fChoice, value: status, choices: statusChoices},
+		{label: "Rail", kind: fChoice, value: rail, choices: railChoices},
 	}
 	for _, fl := range f.fields {
 		if fl.kind == fText {
@@ -63,6 +82,15 @@ func newEditForm(s model.Subscription) *editForm {
 	}
 	f.fields[0].input.Focus()
 	return f
+}
+
+func containsStr(list []string, v string) bool {
+	for _, s := range list {
+		if s == v {
+			return true
+		}
+	}
+	return false
 }
 
 func (f *editForm) current() *formField { return f.fields[f.idx] }

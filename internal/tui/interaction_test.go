@@ -87,6 +87,70 @@ func TestSubscriptionsEditFlow(t *testing.T) {
 	}
 }
 
+func TestSubscriptionsAddFlow(t *testing.T) {
+	conn, err := db.Open(t.TempDir() + "/add.db")
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	defer conn.Close()
+	ctx := context.Background()
+
+	// seed one sub so the list isn't empty
+	if _, err := db.CreateSubscription(ctx, conn, &model.Subscription{
+		Service: "Netflix", Amount: 64900, Cycle: "monthly", Status: "active",
+	}); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+
+	a := New(conn)
+	a.Init()
+	a.Update(tea.WindowSizeMsg{Width: 110, Height: 40})
+
+	a.Update(keyRune('2'))
+	a.Update(keyRune('a')) // add
+	if a.subsMode != subsForm || a.form == nil {
+		t.Fatalf("expected add form, mode=%d form=%v", a.subsMode, a.form != nil)
+	}
+	if a.form.targetID != 0 {
+		t.Errorf("add form targetID = %d, want 0", a.form.targetID)
+	}
+
+	// defaults: amount empty, cycle monthly, status active, rail merchant_direct
+	if a.form.fields[4].value != "monthly" || a.form.fields[5].value != "active" || a.form.fields[6].value != "merchant_direct" {
+		t.Errorf("add defaults: cycle=%s status=%s rail=%s", a.form.fields[4].value, a.form.fields[5].value, a.form.fields[6].value)
+	}
+
+	// type service "Notion"
+	for _, r := range "Notion" {
+		a.Update(keyRune(r))
+	}
+	// down to Amount, type 349.00
+	a.Update(key(tea.KeyDown))
+	for _, r := range "349.00" {
+		a.Update(keyRune(r))
+	}
+	// down to Next due, type a date
+	a.Update(key(tea.KeyDown))
+	a.Update(key(tea.KeyDown))
+	for _, r := range "2026-09-01" {
+		a.Update(keyRune(r))
+	}
+	a.Update(key(tea.KeyCtrlS))
+
+	if a.subsMode != subsList {
+		t.Fatalf("expected list after add, mode=%d err=%v", a.subsMode, a.err)
+	}
+
+	got, ok, err := db.GetSubscriptionByService(ctx, conn, "Notion")
+	if err != nil || !ok {
+		t.Fatalf("Notion not created: %v", err)
+	}
+	if got.Amount != 34900 || got.Cycle != "monthly" || got.Status != "active" ||
+		got.Rail != "merchant_direct" || got.NextPaymentDate != "2026-09-01" {
+		t.Errorf("created sub unexpected: %+v", got)
+	}
+}
+
 func TestFormValidation(t *testing.T) {
 	conn, err := db.Open(t.TempDir() + "/form.db")
 	if err != nil {
@@ -103,7 +167,7 @@ func TestFormValidation(t *testing.T) {
 	}
 	s, _ := db.GetSubscription(ctx, conn, id)
 
-	f := newEditForm(s)
+	f := newEditForm(s, false)
 	// empty service → error
 	f.fields[0].input.SetValue("")
 	if _, err := f.Build(s); err == nil || !strings.Contains(err.Error(), "service") {
