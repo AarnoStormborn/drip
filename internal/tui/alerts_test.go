@@ -86,13 +86,13 @@ func TestBannerWidthFallback(t *testing.T) {
 
 	a.Update(tea.WindowSizeMsg{Width: 110, Height: 40})
 	v := a.View()
-	if !strings.Contains(v, "▄▄▄▄▄▄▄") {
+	if !strings.Contains(v, "$$$$$$$") {
 		t.Error("wide terminal: wordmark missing")
 	}
 
 	a.Update(tea.WindowSizeMsg{Width: 60, Height: 40})
 	v = a.View()
-	if strings.Contains(v, "▄▄▄▄▄▄▄") {
+	if strings.Contains(v, "$$$$$$$") {
 		t.Error("narrow terminal: wordmark should be hidden")
 	}
 	if !strings.Contains(v, "Drip — subscription tracker") {

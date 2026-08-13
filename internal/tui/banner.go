@@ -7,10 +7,19 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// wordmark is the ASCII "DRIP" logo (3 lines, box-drawing characters).
-const wordmark = `▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄
-█     █  █   ▄▄▄     █     █   ▄▄▄
-█▄▄▄▄▄▄▀  █▄▄▄▄▄▄▀     █     █▄▄▄▄▄▄▀`
+// wordmark is the ASCII "DRIP" logo (pure ASCII, renders reliably everywhere).
+const wordmark = `       __            __           
+      /  |          /  |          
+  ____$$ |  ______  $$/   ______  
+ /    $$ | /      \ /  | /      \ 
+/$$$$$$$ |/$$$$$$  |$$ |/$$$$$$  |
+$$ |  $$ |$$ |  $$/ $$ |$$ |  $$ |
+$$ \__$$ |$$ |      $$ |$$ |__$$ |
+$$    $$ |$$ |      $$ |$$    $$/ 
+ $$$$$$$/ $$/       $$/ $$$$$$$/  
+                        $$ |      
+                        $$ |      
+                        $$/       `
 
 var (
 	bannerStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("213"))
