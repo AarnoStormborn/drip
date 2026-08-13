@@ -191,7 +191,7 @@ func (a *App) renderSubsList() string {
 		rows = append(rows, row)
 	}
 
-	body := strings.Join(rows, "\n")
+	body := rows[0] + "\n\n" + strings.Join(rows[1:], "\n\n")
 	if a.err != nil {
 		body += "\n\n" + errorStyle.Render("⚠ "+a.err.Error())
 	}

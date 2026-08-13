@@ -27,11 +27,15 @@ var (
 // below it the header falls back to a one-line title.
 const minBannerWidth = 84
 
+// marginLeft indents the banner from the left edge so it doesn't hug the
+// terminal border; the rest of the header stack stays flush.
+const marginLeft = 2
+
 // renderBanner draws the top of every screen: the ASCII wordmark, or a
 // one-line title on narrow terminals.
 func (a *App) renderBanner() string {
 	if a.w >= minBannerWidth {
-		return bannerStyle.Render(wordmark)
+		return bannerStyle.PaddingLeft(marginLeft).Render(wordmark)
 	}
-	return taglineStyle.Render("Drip — subscription tracker")
+	return taglineStyle.PaddingLeft(marginLeft).Render("Drip — subscription tracker")
 }
