@@ -208,7 +208,8 @@ func (a *App) refresh() {
 }
 
 func (a *App) View() string {
-	header := a.renderHeader()
+	// Layout: banner → alert strip → tabs → content → footer
+	header := a.renderBanner()
 
 	var body string
 	switch a.tab {
@@ -230,7 +231,8 @@ func (a *App) View() string {
 		alertLine = a.renderAlert()
 	}
 
-	content := lipgloss.JoinVertical(lipgloss.Left, header, alertLine, contentStyle.Render(body))
+	content := lipgloss.JoinVertical(lipgloss.Left,
+		header, alertLine, a.renderTabs(), contentStyle.Render(body))
 	footer := footerStyle.Render(
 		"1 Dashboard · 2 Subscriptions · 3 Import · 4 Reconcile · tab/⇧tab switch · r refresh · x dismiss · q quit")
 
