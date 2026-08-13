@@ -200,7 +200,170 @@ func (f *editForm) Build(s model.Subscription) (model.Subscription, error) {
 	return s, nil
 }
 
-// View renders the form.
+// ── mandate form (Reconcile tab) ──────────────────────────────────────────
+
+// mandateForm adds a single mandate manually (Service, Amount, Next debit,
+// Cycle). Edit = delete + re-add for now.
+type mandateForm struct {
+	fields    []*formField
+	idx       int
+	Err       string
+	Cancelled bool
+}
+
+func newMandateForm() *mandateForm {
+	f := &mandateForm{}
+	cycleChoices := []string{"weekly", "monthly", "quarterly", "half-yearly", "yearly"}
+	f.fields = []*formField{
+		{label: "Service", kind: fText},
+		{label: "Amount (₹)", kind: fText},
+		{label: "Next debit (YYYY-MM-DD, optional)", kind: fText},
+		{label: "Cycle", kind: fChoice, value: "monthly", choices: cycleChoices},
+	}
+	for _, fl := range f.fields {
+		if fl.kind == fText {
+			ti := textinput.New()
+			ti.Placeholder = fl.label
+			ti.CharLimit = 80
+			fl.input = ti
+		}
+	}
+	f.fields[0].input.Focus()
+	return f
+}
+
+func (f *mandateForm) current() *formField { return f.fields[f.idx] }
+
+func (f *mandateForm) move(delta int) {
+	prev := f.idx
+	f.idx += delta
+	if f.idx < 0 {
+		f.idx = len(f.fields) - 1
+	}
+	if f.idx >= len(f.fields) {
+		f.idx = 0
+	}
+	if f.current().kind == fText {
+		f.current().input.Focus()
+	}
+	if f.fields[prev].kind == fText {
+		f.fields[prev].input.Blur()
+	}
+}
+
+func (f *mandateForm) cycle(delta int) {
+	fl := f.current()
+	if fl.kind != fChoice {
+		return
+	}
+	idx := -1
+	for i, c := range fl.choices {
+		if c == fl.value {
+			idx = i
+			break
+		}
+	}
+	if idx < 0 {
+		idx = 0
+	}
+	idx = (idx + delta + len(fl.choices)) % len(fl.choices)
+	fl.value = fl.choices[idx]
+}
+
+func (f *mandateForm) Update(msg tea.Msg) tea.Cmd {
+	switch m := msg.(type) {
+	case tea.KeyMsg:
+		switch m.String() {
+		case "up":
+			f.move(-1)
+			return nil
+		case "down":
+			f.move(1)
+			return nil
+		case "enter":
+			if f.current().kind == fText {
+				f.move(1)
+			} else {
+				f.cycle(1)
+			}
+			return nil
+		case "left":
+			f.cycle(-1)
+			return nil
+		case "right":
+			f.cycle(1)
+			return nil
+		default:
+			if fl := f.current(); fl.kind == fText {
+				fl.input, _ = fl.input.Update(m)
+			}
+		}
+	case tea.WindowSizeMsg:
+		for _, fl := range f.fields {
+			if fl.kind == fText {
+				fl.input.Width = m.Width - 34
+			}
+		}
+	}
+	return nil
+}
+
+// Build validates the fields and returns the mandate to persist.
+func (f *mandateForm) Build() (model.Mandate, error) {
+	svc := strings.TrimSpace(f.fields[0].input.Value())
+	if svc == "" {
+		return model.Mandate{}, fmt.Errorf("service cannot be empty")
+	}
+	amount, err := parseRupees(f.fields[1].input.Value())
+	if err != nil {
+		return model.Mandate{}, err
+	}
+	next := strings.TrimSpace(f.fields[2].input.Value())
+	if next != "" {
+		if _, err := time.Parse("2006-01-02", next); err != nil {
+			return model.Mandate{}, fmt.Errorf("next debit must be YYYY-MM-DD (or empty)")
+		}
+	}
+	return model.Mandate{
+		Service:       svc,
+		Amount:        amount,
+		Cycle:         f.fields[3].value,
+		NextDebitDate: next,
+		UPIApp:        "gpay",
+		Status:        "active",
+	}, nil
+}
+
+func (f *mandateForm) View() string {
+	var b strings.Builder
+	b.WriteString(headerStyle.Render("ADD MANDATE (GPay UPI Autopay)"))
+	b.WriteString("\n\n")
+	for i, fl := range f.fields {
+		marker := "  "
+		if i == f.idx {
+			marker = "▸ "
+		}
+		label := fmt.Sprintf("%-34s", fl.label)
+		var value string
+		switch fl.kind {
+		case fText:
+			value = fl.input.View()
+		case fChoice:
+			value = fl.value
+			if i == f.idx {
+				value = accentStyle.Render(fl.value + "  ←/→ cycle")
+			}
+		}
+		b.WriteString(marker + infoLabel.Render(label) + value + "\n")
+	}
+	if f.Err != "" {
+		b.WriteString("\n" + errorStyle.Render("⚠ "+f.Err) + "\n")
+	}
+	b.WriteString("\n" + hintStyle.Render("↑/↓ move · ←/→ cycle · enter next · ctrl+s save · esc cancel"))
+	return b.String()
+}
+
+// View renders the edit-subscription form.
 func (f *editForm) View() string {
 	var b strings.Builder
 	b.WriteString(headerStyle.Render("EDIT SUBSCRIPTION"))

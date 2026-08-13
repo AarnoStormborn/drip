@@ -59,3 +59,20 @@ type PriceHistory struct {
 	Amount         int64 // paise
 	ChangedAt      string
 }
+
+// Mandate is one UPI AutoPay e-mandate from the GPay mandate list
+// (or another PSP). It is the authoritative "active recurring payments"
+// source per NPCI OC-223, cross-checked against subscriptions in Reconcile.
+type Mandate struct {
+	ID            int64
+	Service       string // merchant name as shown in the mandate list
+	Amount        int64  // paise
+	Cycle         string // weekly|monthly|quarterly|yearly
+	NextDebitDate string // ISO YYYY-MM-DD
+	UPIApp        string // e.g. "gpay"
+	Status        string // active|paused|cancelled
+	Raw           string // original line as copied from the app
+	Notes         string
+	CreatedAt     string
+	UpdatedAt     string
+}

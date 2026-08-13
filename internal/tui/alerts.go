@@ -32,6 +32,13 @@ func (a *App) computeAlerts() []alert {
 			prio: 1,
 		})
 	}
+	if n := len(a.rec.MissingSubs); n > 0 {
+		out = append(out, alert{
+			key:  fmt.Sprintf("missing-sub:%d", n),
+			text: fmt.Sprintf("⚠ %d mandate%s have no matching subscription — press 4 to review", n, plural(n)),
+			prio: 1,
+		})
+	}
 	if n := len(a.dash.DueSoon); n > 0 {
 		out = append(out, alert{
 			key:  fmt.Sprintf("duesoon:%d", n),

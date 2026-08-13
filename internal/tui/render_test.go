@@ -44,7 +44,7 @@ func TestRenderAllTabs(t *testing.T) {
 		TabDashboard:     {"Active subscriptions", "Monthly spend", "Netflix", "₹649.00"},
 		TabSubscriptions: {"SERVICE", "Netflix", "YouTube Premium", "Notion Plus", "Monthly", "paused"},
 		TabImport:        {"MONTHLY ROUTINE", "drip import", "Recurring detection"},
-		TabReconcile:     {"Reconcile", "milestone 7"},
+		TabReconcile:     {"No mandates yet", "drip mandates import"},
 	}
 	for tab, needles := range want {
 		a.tab = tab
