@@ -53,19 +53,3 @@ func (a *App) renderImport() string {
 	}
 	return b.String()
 }
-
-func (a *App) renderReconcile() string {
-	return cardStyle.Render(lipgloss.JoinVertical(lipgloss.Left,
-		accentStyle.Render("Reconcile — planned (milestone 7)"),
-		"",
-		mutedStyle.Render(
-			"Cross-checks your GPay UPI Autopay mandate list against the ledger:",
-			"  • mandates with no matching subscription → add prompt",
-			"  • subscriptions missing from the mandate list → flag (maybe cancelled at source)",
-			"  • amount / next-due mismatches → flag for review",
-			"",
-			"The GPay UPI Autopay screen is the authoritative “active subscriptions” source",
-			"per NPCI OC-223 — this view turns that list into actionable diffs.",
-		),
-	))
-}

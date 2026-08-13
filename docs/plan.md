@@ -76,7 +76,7 @@ Plus `drip mandate add`: paste/copy GPay **UPI Autopay list** (authoritative, cr
 4. ⏳ **Card PDFs** — unlock + extract HDFC/ICICI card statements
 5. ⏳ **GPay** — statement PDF + mandate list ingestion
 6. ✅ **TUI polish** — interactive subscriptions tab: ↑/↓ select, detail view (price history, descriptors), add (a) + edit (e) forms, delete confirm; dashboard due-in-7-days + OVERDUE sections; due-today/overdue ⚠ markers
-7. ⏳ **Reconcile view** + backfill from existing statements
+7. ✅ **Reconcile view** — mandates table + `drip mandates import/list` (lenient GPay-mandate-line parser); Reconcile tab diffs mandates vs ledger (missing subscription / not in mandate list / amount mismatch) with promote → subscription, add, delete; alert when mandates lack a match
 
 ## Open items (verify during build)
 
