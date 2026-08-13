@@ -15,7 +15,7 @@ type alert struct {
 }
 
 var (
-	alertP1 = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
+	alertP1 = lipgloss.NewStyle().Bold(true).Foreground(dangerColor)
 	alertP2 = lipgloss.NewStyle().Foreground(lipgloss.Color("214"))
 	alertP3 = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
 )

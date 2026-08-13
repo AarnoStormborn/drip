@@ -209,8 +209,6 @@ func (a *App) refresh() {
 
 func (a *App) View() string {
 	// Layout: banner → alert strip → tabs → content → footer
-	header := a.renderBanner()
-
 	var body string
 	switch a.tab {
 	case TabDashboard:
@@ -226,13 +224,15 @@ func (a *App) View() string {
 		body = errorStyle.Render("⚠ "+a.err.Error()) + "\n\n" + body
 	}
 
-	var alertLine string
+	// Layout: banner → alert strip → tabs → content → footer,
+	// with a blank line between each section.
+	stack := []string{a.renderBanner()}
 	if a.alertText != "" {
-		alertLine = a.renderAlert()
+		stack = append(stack, "", a.renderAlert())
 	}
-
-	content := lipgloss.JoinVertical(lipgloss.Left,
-		header, alertLine, a.renderTabs(), contentStyle.Render(body))
+	stack = append(stack, "", a.renderTabs())
+	stack = append(stack, contentStyle.Render(body))
+	content := lipgloss.JoinVertical(lipgloss.Left, stack...)
 	footer := footerStyle.Render(
 		"1 Dashboard · 2 Subscriptions · 3 Import · 4 Reconcile · tab/⇧tab switch · r refresh · x dismiss · q quit")
 

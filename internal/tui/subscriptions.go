@@ -26,10 +26,10 @@ const (
 
 var (
 	selStyle     = lipgloss.NewStyle().Background(lipgloss.Color("236"))
-	dueToday     = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
+	dueToday     = lipgloss.NewStyle().Bold(true).Foreground(dangerColor)
 	infoLabel    = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
 	hintStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Italic(true)
-	overdueStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
+	overdueStyle = lipgloss.NewStyle().Bold(true).Foreground(dangerColor)
 )
 
 // handleSubsKey routes keys while on the Subscriptions tab (list/detail/confirm).

@@ -2,6 +2,10 @@ package tui
 
 import "github.com/charmbracelet/lipgloss"
 
+// dangerColor is a dampened red (muted 167) — the raw bright ANSI red (196)
+// is too glaring on dark terminals.
+const dangerColor = lipgloss.Color("167")
+
 var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
@@ -26,7 +30,7 @@ var (
 
 	errorStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("196"))
+			Foreground(dangerColor)
 
 	cardStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
