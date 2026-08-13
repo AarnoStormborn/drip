@@ -33,9 +33,15 @@ type App struct {
 	w, h  int
 	err   error
 
-	dash    DashboardData
-	subs    []model.Subscription // all subscriptions (any status)
-	imports []model.ImportAudit  // recent import runs
+	dash      DashboardData
+	subs      []model.Subscription // all subscriptions (any status)
+	imports   []model.ImportAudit  // recent import runs
+	stmtCount int                  // total raw statement records
+
+	// Alert strip state
+	dismissed map[string]bool // alert keys dismissed this session
+	alertKey  string
+	alertText string
 
 	// Subscriptions tab interaction state
 	subsMode   subsMode
@@ -46,7 +52,7 @@ type App struct {
 
 // New builds the root model. The caller owns closing sqldb.
 func New(sqldb *sql.DB) *App {
-	return &App{sqldb: sqldb}
+	return &App{sqldb: sqldb, dismissed: map[string]bool{}}
 }
 
 func (a *App) Init() tea.Cmd {
@@ -107,6 +113,8 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.refresh()
 		case "r":
 			a.refresh()
+		case "x":
+			a.dismissAlert()
 		default:
 			if a.tab == TabSubscriptions {
 				a.handleSubsKey(m)
@@ -189,15 +197,18 @@ func (a *App) refresh() {
 		return
 	}
 	a.imports = imports
+
+	stmtCount, err := db.CountStatements(ctx, a.sqldb)
+	if err != nil {
+		a.err = err
+		return
+	}
+	a.stmtCount = stmtCount
+	a.refreshAlerts()
 }
 
 func (a *App) View() string {
-	header := lipgloss.JoinHorizontal(lipgloss.Center,
-		titleStyle.Render("Drip — subscription tracker"),
-		"   ",
-		a.renderTabs(),
-	)
-
+	// Layout: banner → alert strip → tabs → content → footer
 	var body string
 	switch a.tab {
 	case TabDashboard:
@@ -213,9 +224,17 @@ func (a *App) View() string {
 		body = errorStyle.Render("⚠ "+a.err.Error()) + "\n\n" + body
 	}
 
-	content := lipgloss.JoinVertical(lipgloss.Left, header, contentStyle.Render(body))
+	// Layout: banner → alert strip → tabs → content → footer,
+	// with a blank line between each section.
+	stack := []string{a.renderBanner()}
+	if a.alertText != "" {
+		stack = append(stack, "", a.renderAlert())
+	}
+	stack = append(stack, "", a.renderTabs())
+	stack = append(stack, contentStyle.Render(body))
+	content := lipgloss.JoinVertical(lipgloss.Left, stack...)
 	footer := footerStyle.Render(
-		"1 Dashboard · 2 Subscriptions · 3 Import · 4 Reconcile · tab/⇧tab switch · r refresh · q quit")
+		"1 Dashboard · 2 Subscriptions · 3 Import · 4 Reconcile · tab/⇧tab switch · r refresh · x dismiss · q quit")
 
 	frame := lipgloss.JoinVertical(lipgloss.Left, content, footer)
 	if a.h > 0 {

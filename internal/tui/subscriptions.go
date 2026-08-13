@@ -26,10 +26,10 @@ const (
 
 var (
 	selStyle     = lipgloss.NewStyle().Background(lipgloss.Color("236"))
-	dueToday     = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
+	dueToday     = lipgloss.NewStyle().Bold(true).Foreground(dangerColor)
 	infoLabel    = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
 	hintStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Italic(true)
-	overdueStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("196"))
+	overdueStyle = lipgloss.NewStyle().Bold(true).Foreground(dangerColor)
 )
 
 // handleSubsKey routes keys while on the Subscriptions tab (list/detail/confirm).
@@ -191,7 +191,7 @@ func (a *App) renderSubsList() string {
 		rows = append(rows, row)
 	}
 
-	body := strings.Join(rows, "\n")
+	body := rows[0] + "\n\n" + strings.Join(rows[1:], "\n\n")
 	if a.err != nil {
 		body += "\n\n" + errorStyle.Render("⚠ "+a.err.Error())
 	}
