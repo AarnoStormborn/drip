@@ -3,7 +3,7 @@ package tui
 import (
 	"testing"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 func TestFormatINR(t *testing.T) {

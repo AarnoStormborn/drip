@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 const subCols = `id, service, category, amount, currency, cycle, rail, mandate_id,

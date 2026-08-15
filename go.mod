@@ -1,4 +1,4 @@
-module drip
+module github.com/AarnoStormborn/drip
 
 go 1.26.5
 

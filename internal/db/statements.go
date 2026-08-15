@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // InsertStatements batch-inserts parsed statement records in a transaction.

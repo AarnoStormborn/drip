@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/db"
 )
 
 func TestImportFileAndDedupe(t *testing.T) {

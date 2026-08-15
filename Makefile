@@ -1,10 +1,16 @@
-.PHONY: build run test vet tidy clean
+.PHONY: build run test vet tidy install clean
+
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+LDFLAGS  = -s -w -X main.version=$(VERSION)
 
 build:
-	go build -o bin/drip ./cmd/drip
+	go build -ldflags "$(LDFLAGS)" -o bin/drip ./cmd/drip
 
 run:
-	go run ./cmd/drip
+	go run -ldflags "$(LDFLAGS)" ./cmd/drip
+
+install:
+	go install -ldflags "$(LDFLAGS)" ./cmd/drip
 
 test:
 	go test ./...

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 func openTest(t *testing.T) *sql.DB {

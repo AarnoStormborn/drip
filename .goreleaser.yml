@@ -1,0 +1,40 @@
+# GoReleaser config — `goreleaser release` builds archives for GitHub
+# Releases. Triggered by the release workflow on v* tags.
+version: 2
+
+project_name: drip
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: drip
+    main: ./cmd/drip
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

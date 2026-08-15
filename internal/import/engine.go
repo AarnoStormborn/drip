@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"drip/internal/db"
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // Source identifies the origin of a statement file.
