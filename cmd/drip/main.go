@@ -12,14 +12,16 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"drip/internal/db"
-	"drip/internal/detect"
-	"drip/internal/import"
-	"drip/internal/model"
-	"drip/internal/tui"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/detect"
+	"github.com/AarnoStormborn/drip/internal/import"
+	"github.com/AarnoStormborn/drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/tui"
 )
 
-const version = "0.1.0"
+// version is overridden at build time via -ldflags "-X main.version=…"
+// (see Makefile and .goreleaser.yml).
+var version = "dev"
 
 func main() {
 	flag.Usage = func() {

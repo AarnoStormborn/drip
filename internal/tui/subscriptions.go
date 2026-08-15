@@ -10,8 +10,8 @@ import (
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"drip/internal/db"
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // subsMode is the interaction state of the Subscriptions tab.

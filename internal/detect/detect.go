@@ -8,8 +8,8 @@ import (
 	"sort"
 	"time"
 
-	"drip/internal/db"
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // Result summarizes one detection run.

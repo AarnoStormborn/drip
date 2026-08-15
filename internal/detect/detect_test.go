@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"drip/internal/db"
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 func seed(t *testing.T, recs []model.StatementRecord) *sql.DB {

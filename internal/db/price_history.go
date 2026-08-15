@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // ListPriceHistory returns a subscription's amount changes, newest first.

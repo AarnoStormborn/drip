@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // FormatINR renders paise as an Indian-grouped rupee string,

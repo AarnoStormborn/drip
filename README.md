@@ -6,13 +6,30 @@ Built with Go, [Bubble Tea](https://github.com/charmbracelet/bubbletea), and SQL
 
 ## Usage
 
+### Install
+
+```sh
+# Homebrew (macOS)
+brew install aarnostormborn/tap/drip
+
+# or via the Go toolchain
+go install github.com/AarnoStormborn/drip/cmd/drip@latest
+
+# or build locally
+make build && sudo cp bin/drip /usr/local/bin/
+```
+
+### Run
+
 ```sh
 make build        # → bin/drip
 make run          # start the TUI
 make test         # run tests
 
-drip import <dir> # parse statement files in <dir> into the database
-drip detect       # re-scan the ledger for recurring subscriptions
+drip import <dir>            # parse statement files in <dir> into the database
+drip detect                  # re-scan the ledger for recurring subscriptions
+drip mandates import <file>  # load your GPay UPI Autopay list (one per line)
+drip mandates list           # show stored mandates
 ```
 
 ### Keys

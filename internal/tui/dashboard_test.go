@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 func TestBuildDashboardOverdueAndDueSoon(t *testing.T) {

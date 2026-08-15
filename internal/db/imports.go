@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // InsertImport records an import audit row and returns its id.

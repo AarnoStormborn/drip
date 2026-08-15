@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbletea"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 type formKind int

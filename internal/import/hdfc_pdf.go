@@ -8,7 +8,7 @@ import (
 
 	"github.com/ledongthuc/pdf"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // HDFC PDF statements are text-extractable (mobile-app / e-statement
