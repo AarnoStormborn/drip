@@ -29,6 +29,11 @@ var migrations = []string{
 
 // migrate applies the base schema, then any pending migrations, tracking
 // progress in PRAGMA user_version.
+//
+// user_version stores the NUMBER of the last applied migration (migrations
+// are numbered starting at v2; index i → number i+2). Comparing numbers
+// rather than indexing by user_version is what makes pre-existing DBs
+// (created by builds with fewer migrations) migrate forward correctly.
 func migrate(sqldb *sql.DB) error {
 	if _, err := sqldb.Exec(schema); err != nil {
 		return fmt.Errorf("base schema: %w", err)
@@ -39,12 +44,16 @@ func migrate(sqldb *sql.DB) error {
 		return fmt.Errorf("read user_version: %w", err)
 	}
 
-	for i := version; i < len(migrations); i++ {
-		if _, err := sqldb.Exec(migrations[i]); err != nil {
-			return fmt.Errorf("migration %d: %w", i+2, err)
+	for i, migration := range migrations {
+		number := i + 2 // migrations are numbered from v2
+		if number <= version {
+			continue // already applied
 		}
-		if _, err := sqldb.Exec(fmt.Sprintf(`PRAGMA user_version = %d`, i+2)); err != nil {
-			return fmt.Errorf("set user_version %d: %w", i+2, err)
+		if _, err := sqldb.Exec(migration); err != nil {
+			return fmt.Errorf("migration v%d: %w", number, err)
+		}
+		if _, err := sqldb.Exec(fmt.Sprintf(`PRAGMA user_version = %d`, number)); err != nil {
+			return fmt.Errorf("set user_version %d: %w", number, err)
 		}
 	}
 	return nil

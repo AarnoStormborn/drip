@@ -266,9 +266,9 @@ func (a *App) renderReconcileList() string {
 	if len(rec.MissingSubs) > 0 {
 		b.WriteString(overdueStyle.Render("MISSING SUBSCRIPTION — mandate has no ledger match"))
 		b.WriteString("\n")
-		for i, m := range rec.MissingSubs {
-			fmt.Fprintf(&b, "  %s %-26s %s  %s\n", selMark(i == a.recSel), truncate(m.Service, 26),
-				FormatINR(m.Amount), orDash(FormatDate(m.NextDebitDate)))
+		for _, m := range rec.MissingSubs {
+			fmt.Fprintf(&b, "  %s %-26s %s  %s\n", selMark(indexOfMandate(a.mandates, m.ID) == a.recSel),
+				truncate(m.Service, 26), FormatINR(m.Amount), orDash(FormatDate(m.NextDebitDate)))
 		}
 		b.WriteString("\n")
 	}
@@ -333,4 +333,15 @@ func selMark(sel bool) string {
 		return "▸"
 	}
 	return " "
+}
+
+// indexOfMandate returns the position of a mandate (by id) in the full list,
+// or -1 when absent.
+func indexOfMandate(mandates []model.Mandate, id int64) int {
+	for i, m := range mandates {
+		if m.ID == id {
+			return i
+		}
+	}
+	return -1
 }
