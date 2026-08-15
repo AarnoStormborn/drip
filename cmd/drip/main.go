@@ -12,12 +12,12 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"drip/internal/db"
-	"drip/internal/detect"
-	"drip/internal/import"
-	"drip/internal/mandate"
-	"drip/internal/model"
-	"drip/internal/tui"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/detect"
+	"github.com/AarnoStormborn/drip/internal/import"
+	"github.com/AarnoStormborn/drip/internal/mandate"
+	"github.com/AarnoStormborn/drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/tui"
 )
 
 // version is overridden at build time via -ldflags "-X main.version=…"

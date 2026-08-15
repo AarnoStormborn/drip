@@ -3,7 +3,7 @@ package tui
 import (
 	"testing"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 func sub(id int64, service string, amount int64, rail, status string) model.Subscription {

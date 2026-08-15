@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 const mandateCols = `id, service, amount, cycle, next_debit_date, upi_app, status, raw, notes, created_at, updated_at`

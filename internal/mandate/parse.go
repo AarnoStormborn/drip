@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 var (

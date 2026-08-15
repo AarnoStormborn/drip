@@ -9,9 +9,9 @@ import (
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"drip/internal/db"
-	"drip/internal/detect"
-	"drip/internal/model"
+	"github.com/AarnoStormborn/drip/internal/db"
+	"github.com/AarnoStormborn/drip/internal/detect"
+	"github.com/AarnoStormborn/drip/internal/model"
 )
 
 // mismatch pairs a mandate with the subscription it matched, when their
