@@ -90,7 +90,7 @@ func TestBannerWidthFallback(t *testing.T) {
 		t.Error("wide terminal: wordmark missing")
 	}
 
-	a.Update(tea.WindowSizeMsg{Width: 60, Height: 40})
+	a.Update(tea.WindowSizeMsg{Width: 40, Height: 40})
 	v = a.View()
 	if strings.Contains(v, "$$$$$$$") {
 		t.Error("narrow terminal: wordmark should be hidden")
