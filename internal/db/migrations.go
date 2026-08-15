@@ -11,6 +11,20 @@ import (
 var migrations = []string{
 	// v2: merchant descriptors on subscriptions (used by detection/reconcile)
 	`ALTER TABLE subscriptions ADD COLUMN descriptors TEXT NOT NULL DEFAULT '[]';`,
+	// v3: UPI AutoPay mandates (GPay mandate list) for reconcile
+	`CREATE TABLE IF NOT EXISTS mandates (
+		id              INTEGER PRIMARY KEY AUTOINCREMENT,
+		service         TEXT    NOT NULL,
+		amount          INTEGER NOT NULL,
+		cycle           TEXT    NOT NULL DEFAULT 'monthly',
+		next_debit_date TEXT,
+		upi_app         TEXT    NOT NULL DEFAULT 'gpay',
+		status          TEXT    NOT NULL DEFAULT 'active',
+		raw             TEXT,
+		notes           TEXT,
+		created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
+		updated_at      TEXT    NOT NULL DEFAULT (datetime('now'))
+	);`,
 }
 
 // migrate applies the base schema, then any pending migrations, tracking

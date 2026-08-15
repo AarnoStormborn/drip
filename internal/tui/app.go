@@ -48,6 +48,13 @@ type App struct {
 	subsSel    int
 	selHistory []model.PriceHistory
 	form       *editForm
+
+	// Reconcile tab interaction state
+	mandates []model.Mandate
+	rec      ReconcileResult
+	recSel   int
+	recMode  recMode
+	mForm    *mandateForm
 }
 
 // New builds the root model. The caller owns closing sqldb.
@@ -86,6 +93,21 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return a, nil
 		}
+		// Mandate form consumes all keys too (Reconcile tab).
+		if a.tab == TabReconcile && a.recMode == recForm && a.mForm != nil {
+			switch m.String() {
+			case "ctrl+c":
+				return a, tea.Quit
+			case "esc":
+				a.mForm = nil
+				a.recMode = recList
+			case "ctrl+s":
+				a.saveMandate()
+			default:
+				a.mForm.Update(m)
+			}
+			return a, nil
+		}
 
 		switch m.String() {
 		case "q", "ctrl+c":
@@ -103,13 +125,17 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "4":
 			a.tab = TabReconcile
 			a.subsMode = subsList
+			a.recMode = recList
+			a.refresh()
 		case "tab":
 			a.tab = Tab((int(a.tab) + 1) % len(tabNames))
 			a.subsMode = subsList
+			a.recMode = recList
 			a.refresh()
 		case "shift+tab":
 			a.tab = Tab((int(a.tab) + len(tabNames) - 1) % len(tabNames))
 			a.subsMode = subsList
+			a.recMode = recList
 			a.refresh()
 		case "r":
 			a.refresh()
@@ -118,6 +144,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 			if a.tab == TabSubscriptions {
 				a.handleSubsKey(m)
+			}
+			if a.tab == TabReconcile {
+				a.handleRecKey(m)
 			}
 		}
 	}
@@ -204,6 +233,14 @@ func (a *App) refresh() {
 		return
 	}
 	a.stmtCount = stmtCount
+
+	mandates, err := db.ListMandates(ctx, a.sqldb, "")
+	if err != nil {
+		a.err = err
+		return
+	}
+	a.mandates = mandates
+	a.rec = computeReconcile(subs, mandates)
 	a.refreshAlerts()
 }
 

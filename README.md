@@ -26,8 +26,8 @@ make build        # → bin/drip
 make run          # start the TUI
 make test         # run tests
 
-drip import <dir>            # parse statement files in <dir> into the database
-drip detect                  # re-scan the ledger for recurring subscriptions
+drip import <dir> # parse statement files in <dir> into the database
+drip detect       # re-scan the ledger for recurring subscriptions
 drip mandates import <file>  # load your GPay UPI Autopay list (one per line)
 drip mandates list           # show stored mandates
 ```
